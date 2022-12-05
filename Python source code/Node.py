@@ -143,7 +143,7 @@ def firstConnection():
         print("the RTT is " + str(rtt))
         listNewAddresses = answers[0].decode().split('\n')
         listIPAddresses.extend(listNewAddresses)
-        print("the list of all the addresses of the network has been recovered obtained:")
+        print("the list of all the addresses of the network has been obtained:")
         print(str(listIPAddresses))
         error = False
     
@@ -157,9 +157,10 @@ Show the menu and ask for an input
 """
 def showMenu():
     print("Select what you want to do (input a number):")
-    print("1. Send a JSON file")
-    print("2. Broadcast a JSON file")
-    print("3. Exit the program")
+    print("1. Show all ip addresses of the network")
+    print("2. Send a JSON file")
+    print("3. Broadcast a JSON file")
+    print("4. Exit the program")
     return input()
 
 """
@@ -265,17 +266,23 @@ if (error == True):
         print("The connection to the network was impossible. Try again.")
         quit()
 
+#remove duplicates from the list
+listIPAddresses = list(set(listIPAddresses))
+
 #### menu loop
 while (isAppRunning):
     inputStr = showMenu()
     match inputStr:
         case "1":
-            error = sendJSON()
+            print(str(listIPAddresses))
 
         case "2":
+            error = sendJSON()
+
+        case "3":
             error = broadcastJSON()
         
-        case "3":
+        case "4":
             #we need to call a function who can remove the ip address of the node from the list of the network
             isAppRunning = False
             print("The reception Thread is still running. Please kill it. (How to do it in Python I don't know)")
