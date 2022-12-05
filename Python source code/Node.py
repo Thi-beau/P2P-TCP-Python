@@ -158,9 +158,10 @@ Show the menu and ask for an input
 def showMenu():
     print("Select what you want to do (input a number):")
     print("1. Show all ip addresses of the network")
-    print("2. Send a JSON file")
-    print("3. Broadcast a JSON file")
-    print("4. Exit the program")
+    print("2. Display the contents of a json file")
+    print("3. Send a JSON file")
+    print("4. Broadcast a JSON file")
+    print("5. Exit the program")
     return input()
 
 """
@@ -254,6 +255,38 @@ def sendJsonStr(ipAddr, jsonName, jsonStr):
     #We return if there was an error
     return error
 
+"""
+Display a JSON file
+"""
+def openJSON():
+    choice = input("Select: 1.Local / 2.Remote")
+    match choice:
+        case "1":
+            fileName = input('Enter the name of the JSON in the JSON_local folder: ') #fileName example: wheel_rotation_ sensor_data.json
+            # Opening a JSON file
+            file = open('JSON_local/' + fileName)
+            #Reading the file
+            jsonStr = file.read()
+            # Closing file
+            file.close()
+            #display the json
+            print(jsonStr)
+
+        case "2":
+            fileName = input('Enter the name of the JSON in the JSON_local folder: ') #fileName example: wheel_rotation_ sensor_data.json
+            # Opening a JSON file
+            file = open('JSON_remote/' + fileName)
+            #Reading the file
+            jsonStr = file.read()
+            # Closing file
+            file.close()
+            #display the json
+            print(jsonStr)
+        
+        case _:
+            print('Invalid choice')
+
+
 # --- Beginning of the "main" ---
 
 error = startReception()
@@ -266,7 +299,7 @@ if (error == True):
         print("The connection to the network was impossible. Try again.")
         quit()
 
-#remove duplicates from the list
+#remove duplicates from the list if the node connected to itself
 listIPAddresses = list(set(listIPAddresses))
 
 #### menu loop
@@ -277,12 +310,15 @@ while (isAppRunning):
             print(str(listIPAddresses))
 
         case "2":
-            error = sendJSON()
+            openJSON()
 
         case "3":
+            error = sendJSON()
+
+        case "4":
             error = broadcastJSON()
         
-        case "4":
+        case "5":
             #we need to call a function who can remove the ip address of the node from the list of the network
             isAppRunning = False
             print("The reception Thread is still running. Please kill it. (How to do it in Python I don't know)")
