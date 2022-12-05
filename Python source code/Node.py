@@ -11,6 +11,7 @@ import json
 
 # --- Global Variables ---
 isAppRunning = True
+bufferSize = 1500000
 networkPort = 12000
 listIPAddresses = []
 
@@ -60,7 +61,7 @@ def receivingThread(validations):
         connectionSocket, addr = receivingSocket.accept()
         print("Connection accepted")
         #Receiving the data
-        rawData = connectionSocket.recv(1500000)
+        rawData = connectionSocket.recv(bufferSize)
         #Finding what to do with the data
         answer = dataInterpretation(rawData, addr[0])
         connectionSocket.send(answer)
@@ -97,7 +98,7 @@ def sendingThread(destinationIP, data, answers):
         #Sending the request to the server
         requestSocket.send(data)
         #Waiting for the answer of the node
-        answer = requestSocket.recv(1500000)
+        answer = requestSocket.recv(bufferSize)
         #Adding the answer to the results list (pongs)
         answers.append(answer)
         #Closing the socket
@@ -161,6 +162,11 @@ def showMenu():
     print("3. Exit the program")
     return input()
 
+"""
+Ask for a JSON and an address ip of a node. Send the JSON to this node.
+
+@return boolean (true == error)
+"""
 def sendJSON():
     try:
         fileName = input('Enter the name of the JSON in the JSON_local folder: ') #fileName example: wheel_rotation_ sensor_data.json
@@ -182,6 +188,11 @@ def sendJSON():
 
     return error
 
+"""
+Ask for a JSON and braodcast it to all nodes of the network
+
+@return boolean (true == error)
+"""
 def broadcastJSON():
     try:
         fileName = input('Enter the name of the JSON in the JSON_local folder: ') #fileName example: wheel_rotation_ sensor_data.json
@@ -265,7 +276,9 @@ while (isAppRunning):
             error = broadcastJSON()
         
         case "3":
+            #we need to call a function who can remove the ip address of the node from the list of the network
             isAppRunning = False
+            print("The reception Thread is still running. Please kill it. (How to do it in Python I don't know)")
             quit()
 
         case _:
