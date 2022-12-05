@@ -150,6 +150,62 @@ def firstConnection():
     return error
 
 """
+Show the menu and ask for an input
+
+@return string input
+"""
+def showMenu():
+    print("Select what you want to do (input a number):")
+    print("1. Send a JSON file")
+    print("2. Broadcast a JSON file")
+    print("3. Exit the program")
+    return input()
+
+def sendJSON():
+    try:
+        fileName = input('Enter the name of the JSON in the JSON_local folder: ') #fileName example: wheel_rotation_ sensor_data.json
+        # Opening a JSON file
+        file = open('JSON_local/' + fileName)
+        #Reading the file
+        jsonStr = file.read()
+        # Closing file
+        file.close()
+    except Exception:
+        error = True
+        return error
+    #Selection of the ip address
+    ipAddr = input('Enter an IP address: ')
+    if (ipAddr == 'self'):
+        ipAddr = gethostbyname(gethostname())
+    #Send the JSON
+    error = sendJsonStr(ipAddr, fileName, jsonStr)
+
+    return error
+
+def broadcastJSON():
+    try:
+        fileName = input('Enter the name of the JSON in the JSON_local folder: ') #fileName example: wheel_rotation_ sensor_data.json
+        # Opening a JSON file
+        file = open('JSON_local/' + fileName)
+        #Reading the file
+        jsonStr = file.read()
+        # Closing file
+        file.close()
+    except Exception:
+        error = True
+        return error
+
+    for ipAddr in listIPAddresses:
+        #Send the JSON
+        error = sendJsonStr(ipAddr, fileName, jsonStr)
+        if (error):
+            print("An error occurred during the broadcast of one of the files")
+            return error
+
+    error = False
+    return error
+
+"""
 send a JSON string to a node of the network
 
 @return boolean (true == error)
@@ -198,17 +254,24 @@ if (error == True):
         print("The connection to the network was impossible. Try again.")
         quit()
 
-####
+#### menu loop
+while (isAppRunning):
+    inputStr = showMenu()
+    match inputStr:
+        case "1":
+            error = sendJSON()
 
-# Opening a JSON file as example
-file = open('JSON_local/wheel_rotation_ sensor_data.json')
-#Reading the file
-jsonStr = file.read()
-# Closing file
-file.close()
-# returns JSON object as a dictionary
-data = json.loads(jsonStr)
+        case "2":
+            error = broadcastJSON()
+        
+        case "3":
+            isAppRunning = False
+            quit()
 
-#test on self
-ipAddr = gethostbyname(gethostname())
-error = sendJsonStr(ipAddr, 'wheel_rotation_ sensor_data.json', jsonStr)
+        case _:
+            print("invalid input")
+    
+    if (error):
+        print('An error occurred please try again')
+
+quit()
